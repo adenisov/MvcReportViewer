@@ -19,6 +19,8 @@ namespace MvcReportViewer
     {
         internal static readonly string VisibilitySeparator = "~~~";
 
+        internal static readonly string HighPrioritySign = "^";
+
         private const string JsPostForm = @"
 var formElement{0} = document.getElementById('{0}');
 if (formElement{0}) {{
@@ -573,6 +575,18 @@ if (formElement{0}) {{
                           $"{p.Name}{VisibilitySeparator}{p.Visible}",
                           pv))).ToList();
 
+            return this;
+        }
+
+        public IMvcReportViewerOptions InitialParameters(IEnumerable<KeyValuePair<string, object>> initialParameters)
+        {
+            if (initialParameters == null)
+            {
+                return this;
+            }
+
+            _reportParameters = _reportParameters?.Union(initialParameters).ToList() ?? initialParameters.ToList();
+            
             return this;
         }
 

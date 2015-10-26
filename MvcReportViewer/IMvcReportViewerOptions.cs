@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Reporting.WebForms;
@@ -93,5 +92,7 @@ namespace MvcReportViewer
         /// <param name="dataSource">The data.</param>
         /// <returns></returns>
         IMvcReportViewerOptions LocalDataSource<T>(string dataSourceName, T dataSource);
+
+        IMvcReportViewerOptions InitialParameters(IEnumerable<KeyValuePair<string, object>> initialParameters);
     }
 }

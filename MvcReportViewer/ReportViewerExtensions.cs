@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.Reporting.WebForms;
 using System.Web.UI.WebControls;
+using Microsoft.Reporting.WebForms;
 
 namespace MvcReportViewer
 {
@@ -76,6 +76,11 @@ namespace MvcReportViewer
                         parameters.Username,
                         parameters.Password);
                 }
+            }
+
+            if (parameters.InitialParameters.Count > 0)
+            {
+                serverReport.SetParameters(parameters.InitialParameters.Values);
             }
 
             if (parameters.ReportParameters.Count > 0)

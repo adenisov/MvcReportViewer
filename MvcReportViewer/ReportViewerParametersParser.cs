@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
-using Microsoft.Reporting.WebForms;
 using System.Web;
+using Microsoft.Reporting.WebForms;
 using MvcReportViewer.Configuration;
 
 namespace MvcReportViewer
@@ -65,16 +66,19 @@ namespace MvcReportViewer
                             var parsedKey = ParseKey(key);
                             var realKey = parsedKey.Item1;
                             var isVisible = parsedKey.Item2;
+                            var isHighPriority = parsedKey.Item3;
 
-                            if (parameters.ReportParameters.ContainsKey(realKey))
+                            var parametersCollection = GetParameterCollection(parameters, isHighPriority);
+
+                            if (parametersCollection.ContainsKey(realKey))
                             {
-                                parameters.ReportParameters[realKey].Values.Add(realValue);
+                                parametersCollection[realKey].Values.Add(realValue);
                             }
                             else
                             {
                                 var reportParameter = new ReportParameter(realKey) {Visible = isVisible};
                                 reportParameter.Values.Add(realValue);
-                                parameters.ReportParameters.Add(realKey, reportParameter);
+                                parametersCollection.Add(realKey, reportParameter);
                             }
                         }
                     }
@@ -95,21 +99,32 @@ namespace MvcReportViewer
             return parameters;
         }
 
-        private static Tuple<string, bool> ParseKey(string key)
+        private static IDictionary<string, ReportParameter> GetParameterCollection(ReportViewerParameters parameters, bool isHighPriority)
         {
+            return isHighPriority ? parameters.InitialParameters : parameters.ReportParameters;
+        }
+
+        private static Tuple<string, bool, bool> ParseKey(string key)
+        {
+            var isHighPriorityParameter = key.StartsWith(MvcReportViewerIframe.HighPrioritySign);
+            if (isHighPriorityParameter)
+            {
+                key = key.Substring(1, key.Length - 1);
+            }
+
             if (!key.Contains(MvcReportViewerIframe.VisibilitySeparator))
             {
-                return new Tuple<string, bool>(key, true);
+                return new Tuple<string, bool, bool>(key, true, isHighPriorityParameter);
             }
 
             var parts = key.Split(new[] { MvcReportViewerIframe.VisibilitySeparator }, StringSplitOptions.RemoveEmptyEntries);
             bool isVisible;
             if (parts.Length != 2 || !bool.TryParse(parts[1], out isVisible))
             {
-                return new Tuple<string, bool>(key, true);
+                return new Tuple<string, bool, bool>(key, true, isHighPriorityParameter);
             }
 
-            return new Tuple<string, bool>(parts[0], isVisible);
+            return new Tuple<string, bool, bool>(parts[0], isVisible, isHighPriorityParameter);
         }
 
         private static bool CheckEncryption(ref NameValueCollection source)

@@ -1,7 +1,7 @@
-﻿using Microsoft.Reporting.WebForms;
+﻿using System;
 using System.Collections.Generic;
-using System;
 using System.Data;
+using Microsoft.Reporting.WebForms;
 
 namespace MvcReportViewer
 {
@@ -9,6 +9,7 @@ namespace MvcReportViewer
     {
         public ReportViewerParameters()
         {
+            InitialParameters = new Dictionary<string, ReportParameter>();
             ReportParameters = new Dictionary<string, ReportParameter>();
         }
 
@@ -25,6 +26,8 @@ namespace MvcReportViewer
         public ProcessingMode ProcessingMode { get; set; }
 
         public bool IsAzureSsrs { get; set; }
+
+        public IDictionary<string, ReportParameter>  InitialParameters { get; set; }
 
         public IDictionary<string, ReportParameter> ReportParameters { get; set; }
 
